@@ -434,7 +434,9 @@ function clearData(){if(!confirm('清空所有数据？'))return;D={rooms:[],rec
 
 // DEMO
 function demo(){
-  if(D.rooms.length)return;
+  if(D.rooms.length>=8)return;
+  // 旧数据(少于8个房间)清空后重新生成
+  if(D.rooms.length>0&&D.rooms.length<8){D={rooms:[],records:[]};}
   D.rooms=[
     {no:'101',name:'豪华大床房',items:buildItems('101',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
     {no:'102',name:'标准双床房',items:buildItems('102',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
