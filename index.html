@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一物一码 · 卫生溯源系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d9488,#14b8a6,#06b6d4)}
+.wrap{text-align:center;padding:40px 20px;max-width:480px;width:100%}
+.logo{width:72px;height:72px;background:rgba(255,255,255,.2);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;backdrop-filter:blur(8px)}
+h1{color:#fff;font-size:26px;margin-bottom:6px}
+p{color:rgba(255,255,255,.8);font-size:14px;margin-bottom:32px}
+.cards{display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;text-decoration:none;color:#1a1a1a;box-shadow:0 4px 20px rgba(0,0,0,.1);transition:.2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.card .ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.card .ico.a{background:#ccfbf1}.card .ico.s{background:#fef3c7}.card .ico.g{background:#dbeafe}
+.card .info h3{font-size:16px;font-weight:600;margin-bottom:2px}
+.card .info span{font-size:12px;color:#888}
+.card .arrow{margin-left:auto;font-size:18px;color:#ccc}
+.ftr{margin-top:32px;color:rgba(255,255,255,.5);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">🛡️</div>
+  <h1>一物一码卫生溯源</h1>
+  <p>酒店民宿客房用品卫生透明管理系统</p>
+  <div class="cards">
+    <a class="card" href="admin.html">
+      <div class="ico a">⚙️</div>
+      <div class="info"><h3>管理后台</h3><span>房间管理 · 用品管理 · 二维码生成</span></div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="staff.html">
+      <div class="ico s">🧹</div>
+      <div class="info"><h3>保洁录入</h3><span>选房间 · 选用品 · 录入消毒记录</span></div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="guest.html">
+      <div class="ico g">👀</div>
+      <div class="info"><h3>客人查询</h3><span>扫码查看房间卫生档案</span></div>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+  <div class="ftr">房间二维码扫码后自动跳转客人查询页</div>
+</div>
+</body>
+</html>
