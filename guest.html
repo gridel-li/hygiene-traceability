@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>房间卫生溯源</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh;padding-bottom:40px}
+
+.hdr{text-align:center;padding:48px 20px 24px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff}
+.hdr .ico{width:60px;height:60px;background:rgba(255,255,255,.2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;backdrop-filter:blur(4px)}
+.hdr h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.hdr p{font-size:13px;opacity:.85}
+
+.picker{margin:16px;padding:20px;background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.picker select{width:100%;padding:12px;border:1px solid #e0e0e0;border-radius:10px;font-size:15px;background:#fff;margin-bottom:6px}
+.picker .hint{text-align:center;font-size:11px;color:#999;margin-top:6px}
+
+.room-info{margin:0 16px 12px;padding:14px 18px;background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between}
+.room-info .left{display:flex;align-items:center;gap:10px}
+.room-info .dot{width:10px;height:10px;border-radius:50%;background:#22c55e}
+.room-info h2{font-size:17px;font-weight:600}
+.room-info .count{font-size:12px;color:#888}
+
+.sec{margin:0 16px 14px}
+.sec-hd{display:flex;align-items:center;gap:8px;padding:8px 0 10px}
+.sec-hd .ic{font-size:18px}
+.sec-hd h3{font-size:15px;font-weight:600}
+.sec-hd .tag{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:10px;background:#d1fae5;color:#065f46}
+
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;margin-bottom:10px}
+.card-body{padding:14px 16px}
+.card-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid #f5f5f5}
+.card-row:last-child{border:none}
+.card-row .lb{color:#888}
+.card-row .vl{font-weight:500;text-align:right;max-width:60%;word-break:break-all}
+.card-row .vl.ok{color:#0d9488}
+.card-row .vl.warn{color:#f59e0b}
+
+.tl{padding:0 16px 10px}
+.tl h4{font-size:12px;color:#888;margin-bottom:10px;font-weight:500}
+.tl-item{display:flex;gap:10px;position:relative;padding-bottom:14px}
+.tl-item::before{content:'';position:absolute;left:13px;top:30px;bottom:0;width:2px;background:#e5e7eb}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:28px;height:28px;border-radius:50%;background:#f0fdfa;border:2px solid #14b8a6;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#0d9488;font-weight:700}
+.tl-body{flex:1;padding-top:3px}
+.tl-body .t{font-size:11px;color:#999}
+.tl-body .d{font-size:13px;font-weight:500;margin-top:2px}
+.tl-body .n{font-size:11px;color:#aaa;margin-top:2px}
+
+.empty{text-align:center;padding:40px 20px;color:#999}
+.empty .ic{font-size:36px;margin-bottom:10px}
+.empty p{font-size:13px}
+
+.std-bar{margin:0 16px 14px;padding:12px 16px;background:linear-gradient(135deg,#f0fdfa,#ecfdf5);border-radius:12px;border:1px solid #a7f3d0;display:flex;align-items:center;gap:10px}
+.std-bar .ck{width:22px;height:22px;border-radius:50%;background:#0d9488;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.std-bar span{font-size:13px;color:#065f46;font-weight:500}
+
+.ftr{text-align:center;padding:20px;font-size:11px;color:#bbb}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="ico">🛡️</div>
+  <h1>房间卫生溯源</h1>
+  <p>扫码查看用品清洁消毒记录</p>
+</div>
+
+<div class="picker" id="picker">
+  <select id="selRoom" onchange="loadRoom()">
+    <option value="">— 选择房间 —</option>
+  </select>
+  <div class="hint">💡 扫描房间内二维码自动跳转</div>
+</div>
+
+<div id="content"></div>
+
+<div class="ftr">一物一码 · 卫生透明 · 安心入住</div>
+
+<script>
+const K='ht_db';
+function ld(){try{return JSON.parse(localStorage.getItem(K))}catch(e){}return{rooms:[],records:[]}}
+const D=ld();
+
+function init(){
+  const sel=document.getElementById('selRoom');
+  sel.innerHTML='<option value="">— 选择房间 —</option>'+
+    D.rooms.map(r=>`<option value="${r.no}">${r.no} ${r.name}</option>`).join('');
+  // URL auto jump
+  const p=new URLSearchParams(location.search);
+  const room=p.get('room');
+  if(room&&D.rooms.find(r=>r.no===room)){
+    sel.value=room;
+    loadRoom();
+  }
+}
+
+function loadRoom(){
+  const no=document.getElementById('selRoom').value;
+  const ctn=document.getElementById('content');
+  if(!no){ctn.innerHTML='';return}
+  const room=D.rooms.find(r=>r.no===no);
+  if(!room){ctn.innerHTML='<div class="empty"><div class="ic">😕</div><p>房间未找到</p></div>';return}
+
+  const groups={cup:[],bed:[],slipper:[]};
+  room.items.forEach(i=>{if(groups[i.type])groups[i.type].push(i)});
+
+  const stdMap={cup:'一客一消毒',bed:'一客一换 · 严格洗护消杀',slipper:'一客一清洗消毒'};
+  const iconMap={cup:'🥤',bed:'🛏️',slipper:'🩴'};
+  const labelMap={cup:'杯子',bed:'床品',slipper:'拖鞋'};
+  const clsMap={cup:'c',bed:'b',slipper:'s'};
+
+  let html=`<div class="room-info"><div class="left"><div class="dot"></div><h2>${room.no} ${room.name}</h2></div><span class="count">${room.items.length} 件用品</span></div>`;
+
+  ['cup','bed','slipper'].forEach(type=>{
+    if(!groups[type].length)return;
+    html+=`<div class="std-bar"><div class="ck">✓</div><span>${stdMap[type]}</span></div>`;
+    html+=`<div class="sec"><div class="sec-hd"><span class="ic">${iconMap[type]}</span><h3>${labelMap[type]}</h3><span class="tag">${groups[type].length} 件</span></div>`;
+    groups[type].forEach(item=>{
+      const recs=D.records.filter(r=>r.itemId===item.id).reverse();
+      const last=recs[0];
+      html+=`<div class="card"><div class="card-body">
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px">${item.name}</div>`;
+      if(last){
+        html+=`<div class="card-row"><span class="lb">卫生标准</span><span class="vl ok">${stdMap[type]}</span></div>
+          <div class="card-row"><span class="lb">最近${last.action}</span><span class="vl">${fmt(last.time)}</span></div>
+          <div class="card-row"><span class="lb">${last.action}方式</span><span class="vl">${last.method}</span></div>
+          <div class="card-row"><span class="lb">负责人</span><span class="vl">${last.staff}</span></div>`;
+      }else{
+        html+=`<div style="text-align:center;padding:10px;color:#f59e0b;font-size:13px">⏳ 暂无清洁记录</div>`;
+      }
+      html+=`</div>`;
+
+      // timeline
+      if(recs.length){
+        html+=`<div class="tl"><h4>历史记录</h4>`;
+        recs.slice(0,5).forEach(r=>{
+          html+=`<div class="tl-item"><div class="tl-dot">✓</div><div class="tl-body">
+            <div class="t">${fmt(r.time)}</div>
+            <div class="d">${r.action} · ${r.method} · ${r.staff}</div>
+            ${r.note?`<div class="n">${r.note}</div>`:''}
+          </div></div>`;
+        });
+        html+=`</div>`;
+      }
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+
+  ctn.innerHTML=html;
+}
+
+function fmt(iso){const d=new Date(iso);const p=n=>String(n).padStart(2,'0');return`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`}
+
+init();
+</script>
+</body>
+</html>

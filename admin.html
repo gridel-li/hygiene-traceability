@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台管理 · 卫生溯源系统</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+:root{--c:#0d9488;--cl:#14b8a6;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g500:#6b7280;--g700:#374151;--g900:#111827;--r:12px;--sh:0 1px 3px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--g50);color:var(--g900);min-height:100vh}
+
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--g200);position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.nav-in{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:52px;gap:24px}
+.brand{font-weight:700;font-size:16px;color:var(--c);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tabs{display:flex;gap:2px}
+.tab{padding:8px 16px;border:none;background:0;font-size:13px;font-weight:500;color:var(--g500);cursor:pointer;border-radius:8px;transition:.15s;white-space:nowrap}
+.tab.on{color:var(--c);background:var(--g100)}
+.tab:hover:not(.on){color:var(--g700)}
+
+.ctn{max-width:1200px;margin:0 auto;padding:20px 24px}
+.pg{display:none}.pg.on{display:block}
+
+/* CARD */
+.cd{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.cd-h{padding:14px 20px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cd-h h2{font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px}
+.cd-b{padding:20px}
+
+/* BUTTON */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:8px;border:none;font-size:12px;font-weight:500;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-p{background:var(--c);color:#fff}.btn-ok{background:var(--ok);color:#fff}.btn-w{background:var(--warn);color:#fff}.btn-e{background:var(--err);color:#fff}.btn-o{background:#fff;color:var(--g700);border:1px solid var(--g300)}
+.btn-lg{padding:12px 24px;font-size:14px;border-radius:10px}
+
+/* FORM */
+.fg{margin-bottom:12px}.fl{display:block;font-size:12px;font-weight:500;color:var(--g700);margin-bottom:4px}
+.fi,.fs{width:100%;padding:9px 12px;border:1px solid var(--g300);border-radius:8px;font-size:13px;font-family:inherit}
+.fi:focus,.fs:focus{outline:none;border-color:var(--c);box-shadow:0 0 0 2px rgba(13,148,136,.08)}
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+
+/* TABLE */
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th,td{padding:9px 12px;text-align:left;font-size:12px;border-bottom:1px solid var(--g200)}
+th{background:var(--g50);font-weight:600;color:var(--g500);white-space:nowrap}
+tr:hover td{background:#f0fdfa}
+
+/* BADGE */
+.bg{display:inline-flex;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:500}
+.bg-c{background:#dbeafe;color:#1d4ed8}.bg-b{background:#fce7f3;color:#be185d}.bg-s{background:#d1fae5;color:#065f46}
+
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.sc{background:#fff;border-radius:var(--r);padding:14px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px}
+.si{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.si-t{background:#ccfbf1}.si-b{background:#dbeafe}.si-p{background:#fce7f3}.si-a{background:#fef3c7}
+.sinf h3{font-size:20px;font-weight:700}.sinf p{font-size:11px;color:var(--g500)}
+
+/* QR */
+.qg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.qc{background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:14px;text-align:center;transition:.2s}
+.qc:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.qc canvas{width:130px!important;height:130px!important;margin:0 auto 8px;display:block}
+.qc h4{font-size:13px;margin-bottom:2px}.qc p{font-size:10px;color:var(--g500)}
+.qc .qa{margin-top:6px;display:flex;gap:4px;justify-content:center}
+
+/* ITEM GRID */
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.ic-card{background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:14px;transition:.2s}
+.ic-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.ic-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ic-top h4{font-size:13px;display:flex;align-items:center;gap:4px}
+.ic-info{font-size:11px;color:var(--g500);line-height:1.7;margin-bottom:8px}
+.ic-info span{display:block}
+.ic-acts{display:flex;gap:4px;flex-wrap:wrap}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;align-items:center;justify-content:center;padding:16px}
+.mo.show{display:flex}
+.md{background:#fff;border-radius:var(--r);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,.15)}
+.md-h{padding:14px 20px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between}
+.md-h h3{font-size:15px}.md-x{width:28px;height:28px;border-radius:6px;border:none;background:var(--g100);font-size:14px;cursor:pointer}
+.md-b{padding:20px}.md-f{padding:12px 20px;border-top:1px solid var(--g200);display:flex;gap:8px;justify-content:flex-end}
+
+/* FILTER */
+.fb{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fb select{padding:7px 10px;border:1px solid var(--g300);border-radius:8px;font-size:12px;background:#fff}
+
+/* TOAST */
+.to{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:rgba(0,0,0,.7);color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;z-index:200;opacity:0;transition:.25s;pointer-events:none}
+.to.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* EMPTY */
+.emp{text-align:center;padding:40px;color:var(--g500)}.emp .ic{font-size:36px;margin-bottom:10px}.emp h3{font-size:15px;color:var(--g700);margin-bottom:4px}.emp p{font-size:12px;margin-bottom:12px}
+
+/* PRINT */
+.pa{display:none}@media print{body *{visibility:hidden}.pa,.pa *{visibility:visible}.pa{display:block!important;position:absolute;left:0;top:0;width:100%}
+.pgr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}.pi{text-align:center;border:1px solid #ddd;padding:10px;border-radius:8px;page-break-inside:avoid}
+.pi canvas{width:80px!important;height:80px!important}.pi h4{font-size:10px;margin-top:4px}.pi p{font-size:8px;color:#666}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <div class="brand">🛡️ 卫生溯源后台</div>
+    <div class="tabs">
+      <button class="tab on" data-p="dash">📊 总览</button>
+      <button class="tab" data-p="rooms">🏠 房间</button>
+      <button class="tab" data-p="items">📦 用品</button>
+      <button class="tab" data-p="qr">📱 二维码</button>
+      <button class="tab" data-p="recs">📋 记录</button>
+    </div>
+  </div>
+</nav>
+
+<!-- 总览 -->
+<div class="pg on" id="p-dash">
+  <div class="ctn">
+    <div class="sg">
+      <div class="sc"><div class="si si-t">🏠</div><div class="sinf"><h3 id="s-r">0</h3><p>房间</p></div></div>
+      <div class="sc"><div class="si si-b">🥤</div><div class="sinf"><h3 id="s-c">0</h3><p>杯子</p></div></div>
+      <div class="sc"><div class="si si-p">🛏️</div><div class="sinf"><h3 id="s-b">0</h3><p>床品</p></div></div>
+      <div class="sc"><div class="si si-a">🩴</div><div class="sinf"><h3 id="s-s">0</h3><p>拖鞋</p></div></div>
+    </div>
+    <div class="cd">
+      <div class="cd-h"><h2>📋 最近记录</h2></div>
+      <div class="cd-b">
+        <div class="tw"><table><thead><tr><th>时间</th><th>房间</th><th>用品</th><th>操作</th><th>方式</th><th>负责人</th></tr></thead><tbody id="d-tb"></tbody></table></div>
+        <div class="emp" id="d-emp" style="display:none"><div class="ic">📝</div><h3>暂无记录</h3></div>
+      </div>
+    </div>
+    <div class="cd">
+      <div class="cd-b" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-o" onclick="expData()">📤 导出数据</button>
+        <button class="btn btn-o" onclick="document.getElementById('impF').click()">📥 导入数据</button>
+        <input type="file" id="impF" accept=".json" style="display:none" onchange="impData(event)">
+        <button class="btn btn-e" onclick="clearData()">🗑️ 清空数据</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 房间管理 -->
+<div class="pg" id="p-rooms">
+  <div class="ctn">
+    <div class="cd">
+      <div class="cd-h">
+        <h2>🏠 房间管理</h2>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-p" onclick="showM('mRoom')">➕ 添加</button>
+          <button class="btn btn-o" onclick="showM('mBatch')">📋 批量</button>
+        </div>
+      </div>
+      <div class="cd-b">
+        <div class="tw"><table><thead><tr><th>房间号</th><th>名称</th><th>杯子</th><th>床品</th><th>拖鞋</th><th>操作</th></tr></thead><tbody id="r-tb"></tbody></table></div>
+        <div class="emp" id="r-emp" style="display:none"><div class="ic">🏠</div><h3>还没有房间</h3><p>点击"添加"开始</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 用品管理 -->
+<div class="pg" id="p-items">
+  <div class="ctn">
+    <div class="cd">
+      <div class="cd-h">
+        <h2>📦 用品管理</h2>
+        <div class="fb">
+          <select id="iRoom" onchange="renderItems()"><option value="">全部房间</option></select>
+          <select id="iType" onchange="renderItems()"><option value="">全部</option><option value="cup">杯子</option><option value="bed">床品</option><option value="slipper">拖鞋</option></select>
+          <button class="btn btn-p" onclick="showM('mItem')">➕ 添加</button>
+        </div>
+      </div>
+      <div class="cd-b">
+        <div class="ig" id="i-grid"></div>
+        <div class="emp" id="i-emp" style="display:none"><div class="ic">📦</div><h3>暂无用品</h3></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 二维码 -->
+<div class="pg" id="p-qr">
+  <div class="ctn">
+    <div class="cd">
+      <div class="cd-h">
+        <h2>📱 房间二维码（客人扫码用）</h2>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-p" onclick="genQR()">🔄 生成全部</button>
+          <button class="btn btn-ok" onclick="printQR()">🖨️ 打印</button>
+        </div>
+      </div>
+      <div class="cd-b">
+        <p style="font-size:12px;color:var(--g500);margin-bottom:12px">每个房间一个二维码 → 贴在房间内 → 客人扫码查看该房间所有用品卫生记录</p>
+        <div class="qg" id="q-grid"></div>
+        <div class="emp" id="q-emp" style="display:none"><div class="ic">📱</div><h3>暂无房间</h3></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 记录 -->
+<div class="pg" id="p-recs">
+  <div class="ctn">
+    <div class="cd">
+      <div class="cd-h">
+        <h2>📋 全部保洁记录</h2>
+        <div class="fb">
+          <select id="fRoom" onchange="renderRecs()"><option value="">全部房间</option></select>
+          <select id="fType" onchange="renderRecs()"><option value="">全部</option><option value="cup">杯子</option><option value="bed">床品</option><option value="slipper">拖鞋</option></select>
+        </div>
+      </div>
+      <div class="cd-b">
+        <div class="tw"><table><thead><tr><th>时间</th><th>房间</th><th>用品</th><th>操作</th><th>方式</th><th>负责人</th><th>备注</th></tr></thead><tbody id="rec-tb"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mRoom"><div class="md">
+  <div class="md-h"><h3>添加房间</h3><button class="md-x" onclick="hideM('mRoom')">✕</button></div>
+  <div class="md-b">
+    <div class="fg"><label class="fl">房间号 *</label><input class="fi" id="nRNo" placeholder="101"></div>
+    <div class="fg"><label class="fl">名称</label><input class="fi" id="nRName" placeholder="豪华大床房"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">漱口杯</label><input class="fi" type="number" id="nRC1" value="1" min="0"></div>
+      <div class="fg"><label class="fl">饮水杯</label><input class="fi" type="number" id="nRC2" value="1" min="0"></div>
+      <div class="fg"><label class="fl">床单</label><input class="fi" type="number" id="nRSh" value="1" min="0"></div>
+      <div class="fg"><label class="fl">被套</label><input class="fi" type="number" id="nRQu" value="1" min="0"></div>
+      <div class="fg"><label class="fl">枕套</label><input class="fi" type="number" id="nRPl" value="2" min="0"></div>
+      <div class="fg"><label class="fl">拖鞋</label><input class="fi" type="number" id="nRSl" value="2" min="0"></div>
+    </div>
+  </div>
+  <div class="md-f"><button class="btn btn-o" onclick="hideM('mRoom')">取消</button><button class="btn btn-p" onclick="addRoom()">添加</button></div>
+</div></div>
+
+<div class="mo" id="mBatch"><div class="md">
+  <div class="md-h"><h3>批量添加</h3><button class="md-x" onclick="hideM('mBatch')">✕</button></div>
+  <div class="md-b">
+    <div class="fr">
+      <div class="fg"><label class="fl">起始</label><input class="fi" type="number" id="bS" value="101"></div>
+      <div class="fg"><label class="fl">结束</label><input class="fi" type="number" id="bE" value="130"></div>
+      <div class="fg"><label class="fl">前缀</label><input class="fi" id="bP" value="客房"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">漱口杯</label><input class="fi" type="number" id="bC1" value="1" min="0"></div>
+      <div class="fg"><label class="fl">饮水杯</label><input class="fi" type="number" id="bC2" value="1" min="0"></div>
+      <div class="fg"><label class="fl">床单</label><input class="fi" type="number" id="bSh" value="1" min="0"></div>
+      <div class="fg"><label class="fl">被套</label><input class="fi" type="number" id="bQu" value="1" min="0"></div>
+      <div class="fg"><label class="fl">枕套</label><input class="fi" type="number" id="bPl" value="2" min="0"></div>
+      <div class="fg"><label class="fl">拖鞋</label><input class="fi" type="number" id="bSl" value="2" min="0"></div>
+    </div>
+  </div>
+  <div class="md-f"><button class="btn btn-o" onclick="hideM('mBatch')">取消</button><button class="btn btn-p" onclick="doBatch()">批量添加</button></div>
+</div></div>
+
+<div class="mo" id="mItem"><div class="md">
+  <div class="md-h"><h3>添加用品</h3><button class="md-x" onclick="hideM('mItem')">✕</button></div>
+  <div class="md-b">
+    <div class="fg"><label class="fl">房间</label><select class="fs" id="nIRoom"></select></div>
+    <div class="fg"><label class="fl">类型</label><select class="fs" id="nIType"><option value="cup">杯子</option><option value="bed">床品</option><option value="slipper">拖鞋</option></select></div>
+    <div class="fg"><label class="fl">名称</label><input class="fi" id="nIName" placeholder="漱口杯"></div>
+  </div>
+  <div class="md-f"><button class="btn btn-o" onclick="hideM('mItem')">取消</button><button class="btn btn-p" onclick="addItem()">添加</button></div>
+</div></div>
+
+<div class="mo" id="mItemRec"><div class="md">
+  <div class="md-h"><h3>用品保洁记录</h3><button class="md-x" onclick="hideM('mItemRec')">✕</button></div>
+  <div class="md-b" id="mItemBody"></div>
+  <div class="md-f"><button class="btn btn-o" onclick="hideM('mItemRec')">关闭</button></div>
+</div></div>
+
+<div class="to" id="to"></div>
+<div class="pa" id="pa"><div class="pgr" id="pgr"></div></div>
+
+<script>
+const K='ht_db';
+function ld(){try{return JSON.parse(localStorage.getItem(K))}catch(e){}return{rooms:[],records:[]}}
+function sv(d){localStorage.setItem(K,JSON.stringify(d))}
+let D=ld();
+
+// NAV
+document.querySelectorAll('.tab[data-p]').forEach(t=>{t.onclick=()=>go(t.dataset.p)});
+function go(p){
+  document.querySelectorAll('.pg').forEach(x=>x.classList.remove('on'));
+  document.getElementById('p-'+p).classList.add('on');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.p===p));
+  if(p==='dash')renderDash();
+  if(p==='rooms')renderRooms();
+  if(p==='items'){popIRoom();renderItems()}
+  if(p==='qr')renderQR();
+  if(p==='recs'){popFRoom();renderRecs()}
+}
+
+function toast(m){const t=document.getElementById('to');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)}
+function showM(id){document.getElementById(id).classList.add('show')}
+function hideM(id){document.getElementById(id).classList.remove('show')}
+function fmt(iso){const d=new Date(iso);const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`}
+function tL(t){return{cup:'杯子',bed:'床品',slipper:'拖鞋'}[t]||t}
+function tI(t){return{cup:'🥤',bed:'🛏️',slipper:'🩴'}[t]||'📦'}
+function tC(t){return{cup:'c',bed:'b',slipper:'s'}[t]||'c'}
+function findItem(id){for(const r of D.rooms){const i=r.items.find(x=>x.id===id);if(i)return{...i,roomNo:r.no,roomName:r.name}}return null}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+// BUILD ITEMS
+function buildItems(no,v){
+  const items=[];
+  for(let i=0;i<v.c1;i++) items.push({id:`${no}_cup_s${i+1}`,type:'cup',name:'漱口杯',label:`${no}-漱口杯${v.c1>1?(i+1):''}`});
+  for(let i=0;i<v.c2;i++) items.push({id:`${no}_cup_w${i+1}`,type:'cup',name:'饮水杯',label:`${no}-饮水杯${v.c2>1?(i+1):''}`});
+  for(let i=0;i<v.sh;i++) items.push({id:`${no}_bed_sh${i+1}`,type:'bed',name:'床单',label:`${no}-床单${v.sh>1?(i+1):''}`});
+  for(let i=0;i<v.qu;i++) items.push({id:`${no}_bed_qu${i+1}`,type:'bed',name:'被套',label:`${no}-被套${v.qu>1?(i+1):''}`});
+  for(let i=0;i<v.pl;i++) items.push({id:`${no}_bed_pl${i+1}`,type:'bed',name:'枕套',label:`${no}-枕套${v.pl>1?(i+1):''}`});
+  for(let i=0;i<v.sl;i++) items.push({id:`${no}_slip_${i+1}`,type:'slipper',name:`拖鞋${v.sl>1?(i+1):''}`,label:`${no}-拖鞋${v.sl>1?(i+1):''}`});
+  return items;
+}
+
+// DASHBOARD
+function renderDash(){
+  document.getElementById('s-r').textContent=D.rooms.length;
+  document.getElementById('s-c').textContent=D.rooms.reduce((s,r)=>s+r.items.filter(i=>i.type==='cup').length,0);
+  document.getElementById('s-b').textContent=D.rooms.reduce((s,r)=>s+r.items.filter(i=>i.type==='bed').length,0);
+  document.getElementById('s-s').textContent=D.rooms.reduce((s,r)=>s+r.items.filter(i=>i.type==='slipper').length,0);
+  const recs=D.records.slice(-15).reverse();
+  const tb=document.getElementById('d-tb'),emp=document.getElementById('d-emp');
+  if(!recs.length){tb.innerHTML='';emp.style.display='block';return}
+  emp.style.display='none';
+  tb.innerHTML=recs.map(r=>{const i=findItem(r.itemId);return`<tr><td>${fmt(r.time)}</td><td>${r.roomNo}</td><td>${i?i.label:r.itemId}</td><td>${r.action}</td><td>${r.method}</td><td>${r.staff}</td></tr>`}).join('');
+}
+
+// ROOMS
+function addRoom(){
+  const no=document.getElementById('nRNo').value.trim();
+  if(!no){toast('请输入房间号');return}
+  if(D.rooms.find(r=>r.no===no)){toast('已存在');return}
+  const name=document.getElementById('nRName').value.trim()||'客房';
+  const v={c1:+document.getElementById('nRC1').value||0,c2:+document.getElementById('nRC2').value||0,sh:+document.getElementById('nRSh').value||0,qu:+document.getElementById('nRQu').value||0,pl:+document.getElementById('nRPl').value||0,sl:+document.getElementById('nRSl').value||0};
+  D.rooms.push({no,name,items:buildItems(no,v)});
+  sv(D);hideM('mRoom');renderRooms();toast(`房间 ${no} 已添加`);
+}
+function doBatch(){
+  const s=+document.getElementById('bS').value,e=+document.getElementById('bE').value;
+  if(!s||!e||e<s){toast('范围无效');return}
+  const p=document.getElementById('bP').value.trim()||'客房';
+  const v={c1:+document.getElementById('bC1').value||0,c2:+document.getElementById('bC2').value||0,sh:+document.getElementById('bSh').value||0,qu:+document.getElementById('bQu').value||0,pl:+document.getElementById('bPl').value||0,sl:+document.getElementById('bSl').value||0};
+  let c=0;
+  for(let n=s;n<=e;n++){const no=String(n);if(D.rooms.find(r=>r.no===no))continue;D.rooms.push({no,name:`${p}${no}`,items:buildItems(no,v)});c++}
+  sv(D);hideM('mBatch');renderRooms();toast(`添加 ${c} 个房间`);
+}
+function delRoom(no){if(!confirm(`删除房间 ${no}？`))return;D.rooms=D.rooms.filter(r=>r.no!==no);D.records=D.records.filter(r=>r.roomNo!==no);sv(D);renderRooms();toast('已删除')}
+function renderRooms(){
+  const tb=document.getElementById('r-tb'),emp=document.getElementById('r-emp');
+  if(!D.rooms.length){tb.innerHTML='';emp.style.display='block';return}
+  emp.style.display='none';
+  tb.innerHTML=D.rooms.map(r=>{
+    const c=r.items.filter(i=>i.type==='cup').length,b=r.items.filter(i=>i.type==='bed').length,s=r.items.filter(i=>i.type==='slipper').length;
+    return`<tr><td><strong>${r.no}</strong></td><td>${r.name}</td><td><span class="bg bg-c">${c}</span></td><td><span class="bg bg-b">${b}</span></td><td><span class="bg bg-s">${s}</span></td><td><button class="btn btn-e" onclick="delRoom('${r.no}')">删除</button></td></tr>`
+  }).join('');
+}
+
+// ITEMS
+function popIRoom(){
+  const s=document.getElementById('nIRoom');s.innerHTML=D.rooms.map(r=>`<option value="${r.no}">${r.no} ${r.name}</option>`).join('');
+  const f=document.getElementById('iRoom'),v=f.value;
+  f.innerHTML='<option value="">全部房间</option>'+D.rooms.map(r=>`<option value="${r.no}">${r.no} ${r.name}</option>`).join('');
+  f.value=v;
+}
+function addItem(){
+  const no=document.getElementById('nIRoom').value,type=document.getElementById('nIType').value,name=document.getElementById('nIName').value.trim();
+  if(!no){toast('选房间');return}if(!name){toast('填名称');return}
+  const room=D.rooms.find(r=>r.no===no);if(!room)return;
+  room.items.push({id:`${no}_${type}_${uid()}`,type,name,label:`${no}-${name}`});
+  sv(D);hideM('mItem');renderItems();toast('已添加');
+}
+function delItem(rid,id){if(!confirm('删除？'))return;const r=D.rooms.find(x=>x.no===rid);if(r)r.items=r.items.filter(i=>i.id!==id);D.records=D.records.filter(r=>r.itemId!==id);sv(D);renderItems();toast('已删除')}
+function renderItemRec(id){const recs=D.records.filter(r=>r.itemId===id).reverse();const item=findItem(id);if(!item)return;let h=`<h4>${tI(item.type)} ${item.label}</h4>`;if(!recs.length){h+='<p style="text-align:center;color:#999;padding:16px">暂无</p>'}else{h+='<div class="tw"><table><thead><tr><th>时间</th><th>操作</th><th>方式</th><th>负责人</th></tr></thead><tbody>';recs.forEach(r=>{h+=`<tr><td>${fmt(r.time)}</td><td>${r.action}</td><td>${r.method}</td><td>${r.staff}</td></tr>`});h+='</tbody></table></div>'}document.getElementById('mItemBody').innerHTML=h;showM('mItemRec')}
+function renderItems(){
+  const rf=document.getElementById('iRoom').value,tf=document.getElementById('iType').value;
+  const grid=document.getElementById('i-grid'),emp=document.getElementById('i-emp');
+  let items=[];
+  D.rooms.forEach(r=>{if(rf&&r.no!==rf)return;r.items.forEach(i=>{if(tf&&i.type!==tf)return;items.push({...i,roomNo:r.no,roomName:r.name})})});
+  if(!items.length){grid.innerHTML='';emp.style.display='block';return}
+  emp.style.display='none';
+  grid.innerHTML=items.map(it=>{
+    const recs=D.records.filter(r=>r.itemId===it.id).reverse(),last=recs[0];
+    return`<div class="ic-card">
+      <div class="ic-top"><h4>${tI(it.type)} ${it.label}</h4><span class="bg bg-${tC(it.type)}">${tL(it.type)}</span></div>
+      <div class="ic-info"><span>房间 ${it.roomNo} ${it.roomName}</span>${last?`<span>最近${last.action}：${fmt(last.time)}</span><span>${last.method} · ${last.staff}</span>`:'<span style="color:#f59e0b">⚠ 暂无记录</span>'}</div>
+      <div class="ic-acts"><button class="btn btn-o" onclick="renderItemRec('${it.id}')">📋 记录</button><button class="btn btn-e" onclick="delItem('${it.roomNo}','${it.id}')">🗑️</button></div>
+    </div>`
+  }).join('');
+}
+
+// QR
+function renderQR(){
+  const grid=document.getElementById('q-grid'),emp=document.getElementById('q-emp');
+  if(!D.rooms.length){grid.innerHTML='';emp.style.display='block';return}
+  emp.style.display='none';
+  grid.innerHTML=D.rooms.map((r,i)=>`<div class="qc"><canvas id="qv-${i}"></canvas><h4>${r.no} ${r.name}</h4><p>${r.items.length} 件用品</p><div class="qa"><button class="btn btn-o" onclick="dlQR(${i},'${r.no}')">💾 下载</button></div></div>`).join('');
+  // Determine guest page URL
+  const base=location.href.replace(/admin\.html.*$/,'');
+  const guestUrl=base+'guest.html';
+  D.rooms.forEach((r,i)=>{
+    const url=`${guestUrl}?room=${r.no}`;
+    const cv=document.getElementById(`qv-${i}`);
+    if(cv&&typeof QRCode!=='undefined')QRCode.toCanvas(cv,url,{width:130,margin:1,color:{dark:'#111827',light:'#ffffff'}});
+  });
+}
+function genQR(){renderQR();toast('已生成')}
+function dlQR(i,name){const cv=document.getElementById(`qv-${i}`);if(!cv)return;const a=document.createElement('a');a.download=`${name}-房间码.png`;a.href=cv.toDataURL('image/png');a.click()}
+function printQR(){
+  const pg=document.getElementById('pgr'),cards=document.querySelectorAll('#qr-grid .qc');
+  if(!cards.length){toast('先生成');return}
+  pg.innerHTML='';
+  cards.forEach(c=>{const cv=c.querySelector('canvas'),h4=c.querySelector('h4').textContent,p=c.querySelector('p').textContent;const d=document.createElement('div');d.className='pi';const nc=document.createElement('canvas');nc.width=cv.width;nc.height=cv.height;nc.getContext('2d').drawImage(cv,0,0);d.appendChild(nc);d.innerHTML+=`<h4>${h4}</h4><p>${p}</p>`;pg.appendChild(d)});
+  window.print();
+}
+
+// RECORDS
+function popFRoom(){const f=document.getElementById('fRoom'),v=f.value;f.innerHTML='<option value="">全部房间</option>'+D.rooms.map(r=>`<option value="${r.no}">${r.no} ${r.name}</option>`).join('');f.value=v}
+function renderRecs(){
+  const rf=document.getElementById('fRoom').value,tf=document.getElementById('fType').value;
+  let recs=[...D.records].reverse();
+  if(rf)recs=recs.filter(r=>r.roomNo===rf);
+  if(tf)recs=recs.filter(r=>{const i=findItem(r.itemId);return i&&i.type===tf});
+  document.getElementById('rec-tb').innerHTML=recs.map(r=>{const i=findItem(r.itemId);return`<tr><td>${fmt(r.time)}</td><td>${r.roomNo}</td><td>${i?i.label:r.itemId}</td><td>${r.action}</td><td>${r.method}</td><td>${r.staff}</td><td>${r.note||'-'}</td></tr>`}).join('');
+}
+
+// DATA
+function expData(){const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`卫生溯源_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(u);toast('已导出')}
+function impData(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(ev){try{const d=JSON.parse(ev.target.result);if(d.rooms&&d.records){if(confirm(`导入 ${d.rooms.length} 房间、${d.records.length} 记录？`)){D=d;sv(D);renderDash();toast('导入成功')}}else toast('格式不对')}catch(err){toast('解析失败')}};rd.readAsText(f);e.target.value=''}
+function clearData(){if(!confirm('清空所有数据？'))return;D={rooms:[],records:[]};sv(D);renderDash();toast('已清空')}
+
+// DEMO
+function demo(){
+  if(D.rooms.length)return;
+  D.rooms=[
+    {no:'101',name:'豪华大床房',items:buildItems('101',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
+    {no:'102',name:'标准双床房',items:buildItems('102',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
+  ];
+  const now=Date.now();
+  D.records=[
+    {id:uid(),roomNo:'101',itemId:'101_cup_s1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-3600000).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_bed_sh1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-7200000).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_slip_1',action:'清洗',method:'臭氧杀菌',staff:'张阿姨',note:'',time:new Date(now-1800000).toISOString()},
+  ];
+  sv(D);
+}
+demo();renderDash();
+</script>
+</body>
+</html>

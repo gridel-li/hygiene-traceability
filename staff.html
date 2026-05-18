@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>保洁录入</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh}
+
+.hdr{padding:20px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;text-align:center}
+.hdr h1{font-size:20px;font-weight:700;margin-bottom:2px}
+.hdr p{font-size:12px;opacity:.85}
+
+.main{max-width:520px;margin:0 auto;padding:16px}
+
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:14px}
+.card-h{padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px}
+.card-h .ic{font-size:18px}
+.card-h h2{font-size:15px;font-weight:600}
+.card-b{padding:18px}
+
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:13px;font-weight:500;color:#555;margin-bottom:5px}
+.fi,.fs{width:100%;padding:11px 14px;border:1.5px solid #e5e5e5;border-radius:10px;font-size:14px;background:#fff;transition:.2s;font-family:inherit}
+.fi:focus,.fs:focus{outline:none;border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.1)}
+.ft{width:100%;padding:11px 14px;border:1.5px solid #e5e5e5;border-radius:10px;font-size:14px;background:#fff;resize:vertical;min-height:60px;font-family:inherit}
+.ft:focus{outline:none;border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.1)}
+
+.btn-go{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:.2s;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff}
+.btn-go:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,158,11,.3)}
+.btn-go:active{transform:translateY(0)}
+
+.item-peek{padding:12px 16px;background:#fffbeb;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.item-peek .ico{font-size:22px}
+.item-peek .info{flex:1}
+.item-peek .info h4{font-size:14px;font-weight:600}
+.item-peek .info p{font-size:11px;color:#999}
+.item-peek .badge{font-size:10px;padding:2px 8px;border-radius:8px;background:#fef3c7;color:#92400e}
+
+.ok-card{text-align:center;padding:30px 20px}
+.ok-card .big{font-size:48px;margin-bottom:12px}
+.ok-card h3{font-size:18px;font-weight:600;color:#22c55e;margin-bottom:4px}
+.ok-card p{font-size:13px;color:#888}
+
+.history{margin-top:6px}
+.history h3{font-size:14px;font-weight:600;padding:10px 0;display:flex;align-items:center;gap:6px}
+.rec-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.rec-item:last-child{border:none}
+.rec-item .dot{width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0}
+.rec-item .info{flex:1}
+.rec-item .info .t{font-size:11px;color:#999}
+.rec-item .info .d{font-size:13px;font-weight:500}
+.rec-item .info .n{font-size:11px;color:#bbb}
+
+.ftr{text-align:center;padding:16px;font-size:11px;color:#ccc}
+
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:rgba(0,0,0,.75);color:#fff;padding:14px 28px;border-radius:12px;font-size:14px;z-index:100;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🧹 保洁录入</h1>
+  <p>选择房间和用品，录入清洁消毒记录</p>
+</div>
+
+<div class="main">
+  <!-- STEP 1: 选房间 -->
+  <div class="card">
+    <div class="card-h"><span class="ic">🏠</span><h2>选择房间</h2></div>
+    <div class="card-b">
+      <div class="fg">
+        <select class="fs" id="selRoom" onchange="onRoom()">
+          <option value="">— 请选择房间 —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: 选用品 -->
+  <div class="card" id="secItem" style="display:none">
+    <div class="card-h"><span class="ic">📦</span><h2>选择用品</h2></div>
+    <div class="card-b">
+      <div class="fg">
+        <select class="fs" id="selItem" onchange="onItem()">
+          <option value="">— 请选择用品 —</option>
+        </select>
+      </div>
+      <div id="itemPeek"></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: 填记录 -->
+  <div class="card" id="secForm" style="display:none">
+    <div class="card-h"><span class="ic">📝</span><h2>填写记录</h2></div>
+    <div class="card-b">
+      <div class="fg">
+        <label class="fl">操作类型</label>
+        <select class="fs" id="act">
+          <option value="消毒">🧴 消毒</option>
+          <option value="更换">🔄 更换</option>
+          <option value="清洗">🧽 清洗</option>
+          <option value="消杀">🐛 消杀</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">消毒/清洗方式</label>
+        <select class="fs" id="met">
+          <option value="高温消毒柜">高温消毒柜</option>
+          <option value="热力消毒">热力消毒</option>
+          <option value="紫外线消毒">紫外线消毒</option>
+          <option value="化学消毒">化学消毒</option>
+          <option value="专业洗护">专业洗护</option>
+          <option value="高温水洗">高温水洗</option>
+          <option value="臭氧杀菌">臭氧杀菌</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">负责人 *</label>
+        <input class="fi" id="staff" placeholder="保洁员姓名">
+      </div>
+      <div class="fg">
+        <label class="fl">备注</label>
+        <textarea class="ft" id="note" placeholder="可选填写"></textarea>
+      </div>
+      <button class="btn-go" onclick="submit()">✅ 提交记录</button>
+    </div>
+  </div>
+
+  <!-- 提交成功 -->
+  <div class="card" id="secOk" style="display:none">
+    <div class="card-b">
+      <div class="ok-card">
+        <div class="big">✅</div>
+        <h3>记录已保存</h3>
+        <p>客人扫码即可查看</p>
+        <button class="btn-go" style="margin-top:16px;background:linear-gradient(135deg,#22c55e,#16a34a)" onclick="reset()">继续录入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 该用品最近记录 -->
+  <div class="card" id="secHist" style="display:none">
+    <div class="card-b">
+      <div class="history" id="histList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="ftr">一物一码 · 卫生溯源系统</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const K='ht_db';
+function ld(){try{return JSON.parse(localStorage.getItem(K))}catch(e){}return{rooms:[],records:[]}}
+function sv(d){localStorage.setItem(K,JSON.stringify(d))}
+let D=ld();
+
+function init(){
+  const sel=document.getElementById('selRoom');
+  sel.innerHTML='<option value="">— 请选择房间 —</option>'+
+    D.rooms.map(r=>`<option value="${r.no}">${r.no} ${r.name}</option>`).join('');
+}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+
+function onRoom(){
+  const no=document.getElementById('selRoom').value;
+  const sec=document.getElementById('secItem');
+  const sel=document.getElementById('selItem');
+  document.getElementById('secForm').style.display='none';
+  document.getElementById('secOk').style.display='none';
+  document.getElementById('secHist').style.display='none';
+  document.getElementById('itemPeek').innerHTML='';
+  if(!no){sec.style.display='none';return}
+  const room=D.rooms.find(r=>r.no===no);
+  if(!room)return;
+  sec.style.display='';
+  sel.innerHTML='<option value="">— 请选择用品 —</option>'+
+    room.items.map(i=>`<option value="${i.id}">${i.label}（${tL(i.type)}）</option>`).join('');
+}
+
+function tL(t){return{cup:'杯子',bed:'床品',slipper:'拖鞋'}[t]||t}
+function tI(t){return{cup:'🥤',bed:'🛏️',slipper:'🩴'}[t]||'📦'}
+
+function onItem(){
+  const id=document.getElementById('selItem').value;
+  const sec=document.getElementById('secForm');
+  const peek=document.getElementById('itemPeek');
+  document.getElementById('secOk').style.display='none';
+  if(!id){sec.style.display='none';peek.innerHTML='';return}
+  const item=findItem(id);
+  if(!item)return;
+  sec.style.display='';
+  const recs=D.records.filter(r=>r.itemId===id).reverse();
+  const last=recs[0];
+  peek.innerHTML=`<div class="item-peek">
+    <span class="ico">${tI(item.type)}</span>
+    <div class="info"><h4>${item.label}</h4><p>${item.roomNo} ${item.roomName} · ${tL(item.type)}</p></div>
+    ${last?`<span class="badge">上次：${last.action} ${fmt(last.time)}</span>`:''}
+  </div>`;
+  showHist(id);
+}
+
+function findItem(id){for(const r of D.rooms){const i=r.items.find(x=>x.id===id);if(i)return{...i,roomNo:r.no,roomName:r.name}}return null}
+
+function showHist(id){
+  const recs=D.records.filter(r=>r.itemId===id).reverse();
+  const sec=document.getElementById('secHist');
+  const list=document.getElementById('histList');
+  if(!recs.length){sec.style.display='none';return}
+  sec.style.display='';
+  list.innerHTML=`<h3>📋 最近记录</h3>`+
+    recs.slice(0,8).map(r=>`<div class="rec-item">
+      <div class="dot"></div>
+      <div class="info"><div class="t">${fmt(r.time)}</div><div class="d">${r.action} · ${r.method} · ${r.staff}</div>${r.note?`<div class="n">${r.note}</div>`:''}</div>
+    </div>`).join('');
+}
+
+function submit(){
+  const roomNo=document.getElementById('selRoom').value;
+  const itemId=document.getElementById('selItem').value;
+  const staff=document.getElementById('staff').value.trim();
+  if(!roomNo){toast('请选择房间');return}
+  if(!itemId){toast('请选择用品');return}
+  if(!staff){toast('请输入负责人');return}
+  D.records.push({
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    roomNo,itemId,
+    action:document.getElementById('act').value,
+    method:document.getElementById('met').value,
+    staff,
+    note:document.getElementById('note').value.trim(),
+    time:new Date().toISOString()
+  });
+  sv(D);
+  document.getElementById('secForm').style.display='none';
+  document.getElementById('secHist').style.display='none';
+  document.getElementById('secOk').style.display='';
+  toast('✅ 已保存');
+}
+
+function reset(){
+  document.getElementById('secOk').style.display='none';
+  document.getElementById('selItem').value='';
+  document.getElementById('itemPeek').innerHTML='';
+  document.getElementById('secForm').style.display='none';
+  document.getElementById('secHist').style.display='none';
+  document.getElementById('staff').value='';
+  document.getElementById('note').value='';
+}
+
+function fmt(iso){const d=new Date(iso);const p=n=>String(n).padStart(2,'0');return`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`}
+
+init();
+</script>
+</body>
+</html>
