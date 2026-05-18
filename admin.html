@@ -438,12 +438,107 @@ function demo(){
   D.rooms=[
     {no:'101',name:'豪华大床房',items:buildItems('101',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
     {no:'102',name:'标准双床房',items:buildItems('102',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
+    {no:'103',name:'温馨亲子房',items:buildItems('103',{c1:2,c2:1,sh:1,qu:1,pl:3,sl:3})},
+    {no:'104',name:'商务套房',items:buildItems('104',{c1:1,c2:2,sh:1,qu:1,pl:2,sl:2})},
+    {no:'105',name:'景观大床房',items:buildItems('105',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
+    {no:'201',name:'行政套房',items:buildItems('201',{c1:1,c2:2,sh:2,qu:1,pl:4,sl:2})},
+    {no:'202',name:'豪华双床房',items:buildItems('202',{c1:1,c2:1,sh:1,qu:1,pl:2,sl:2})},
+    {no:'203',name:'家庭套房',items:buildItems('203',{c1:2,c2:2,sh:2,qu:2,pl:4,sl:4})},
   ];
   const now=Date.now();
+  const h=3600000;
+  const staff=['张阿姨','李姐','王姐','陈叔','小赵'];
+  const actions=['消毒','更换','清洗','消杀'];
+  const methods=['高温消毒柜','热力消毒','紫外线消毒','化学消毒','专业洗护','高温水洗','臭氧杀菌'];
+  const notes=['','一客一换','已检查无破损','新更换','深度清洁','例行消毒','','客人要求更换','','已晾干'];
   D.records=[
-    {id:uid(),roomNo:'101',itemId:'101_cup_s1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-3600000).toISOString()},
-    {id:uid(),roomNo:'101',itemId:'101_bed_sh1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-7200000).toISOString()},
-    {id:uid(),roomNo:'101',itemId:'101_slip_1',action:'清洗',method:'臭氧杀菌',staff:'张阿姨',note:'',time:new Date(now-1800000).toISOString()},
+    // 101 房间 - 多条记录
+    {id:uid(),roomNo:'101',itemId:'101_cup_s1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_cup_s1',action:'消毒',method:'热力消毒',staff:'李姐',note:'',time:new Date(now-26*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_cup_w1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_bed_sh1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-5*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_bed_qu1',action:'更换',method:'高温水洗',staff:'李姐',note:'一客一换',time:new Date(now-5*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_bed_pl1',action:'更换',method:'高温水洗',staff:'李姐',note:'',time:new Date(now-5*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_bed_pl2',action:'更换',method:'高温水洗',staff:'李姐',note:'',time:new Date(now-5*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_slip_1',action:'清洗',method:'臭氧杀菌',staff:'张阿姨',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_slip_2',action:'清洗',method:'臭氧杀菌',staff:'张阿姨',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'101',itemId:'101_bed_sh1',action:'更换',method:'专业洗护',staff:'王姐',note:'一客一换',time:new Date(now-50*h).toISOString()},
+    // 102 房间
+    {id:uid(),roomNo:'102',itemId:'102_cup_s1',action:'消毒',method:'紫外线消毒',staff:'王姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_cup_w1',action:'消毒',method:'紫外线消毒',staff:'王姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_bed_sh1',action:'更换',method:'高温水洗',staff:'李姐',note:'一客一换',time:new Date(now-8*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_bed_qu1',action:'更换',method:'高温水洗',staff:'李姐',note:'一客一换',time:new Date(now-8*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_bed_pl1',action:'更换',method:'专业洗护',staff:'李姐',note:'',time:new Date(now-8*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_bed_pl2',action:'更换',method:'专业洗护',staff:'李姐',note:'',time:new Date(now-8*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_slip_1',action:'消杀',method:'臭氧杀菌',staff:'陈叔',note:'深度清洁',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_slip_2',action:'消杀',method:'臭氧杀菌',staff:'陈叔',note:'深度清洁',time:new Date(now-4*h).toISOString()},
+    // 103 亲子房 - 更频繁更换
+    {id:uid(),roomNo:'103',itemId:'103_cup_s1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-1.5*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_cup_s2',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-1.5*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_cup_w1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-1.5*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_bed_sh1',action:'更换',method:'专业洗护',staff:'王姐',note:'一客一换',time:new Date(now-6*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_bed_qu1',action:'更换',method:'专业洗护',staff:'王姐',note:'一客一换',time:new Date(now-6*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_bed_pl1',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-6*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_bed_pl2',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-6*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_bed_pl3',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-6*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_slip_1',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_slip_2',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_slip_3',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-2*h).toISOString()},
+    // 104 商务套房
+    {id:uid(),roomNo:'104',itemId:'104_cup_s1',action:'消毒',method:'化学消毒',staff:'陈叔',note:'',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_cup_w1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_cup_w2',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_bed_sh1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-10*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_bed_qu1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-10*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_bed_pl1',action:'更换',method:'高温水洗',staff:'李姐',note:'',time:new Date(now-10*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_bed_pl2',action:'更换',method:'高温水洗',staff:'李姐',note:'',time:new Date(now-10*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_slip_1',action:'消杀',method:'臭氧杀菌',staff:'小赵',note:'已检查无破损',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'104',itemId:'104_slip_2',action:'消杀',method:'臭氧杀菌',staff:'小赵',note:'已检查无破损',time:new Date(now-3*h).toISOString()},
+    // 105 景观大床房
+    {id:uid(),roomNo:'105',itemId:'105_cup_s1',action:'消毒',method:'热力消毒',staff:'王姐',note:'',time:new Date(now-7*h).toISOString()},
+    {id:uid(),roomNo:'105',itemId:'105_cup_w1',action:'消毒',method:'热力消毒',staff:'王姐',note:'',time:new Date(now-7*h).toISOString()},
+    {id:uid(),roomNo:'105',itemId:'105_bed_sh1',action:'更换',method:'高温水洗',staff:'李姐',note:'新更换',time:new Date(now-12*h).toISOString()},
+    {id:uid(),roomNo:'105',itemId:'105_bed_qu1',action:'更换',method:'高温水洗',staff:'李姐',note:'新更换',time:new Date(now-12*h).toISOString()},
+    {id:uid(),roomNo:'105',itemId:'105_slip_1',action:'清洗',method:'臭氧杀菌',staff:'陈叔',note:'',time:new Date(now-6*h).toISOString()},
+    // 201 行政套房
+    {id:uid(),roomNo:'201',itemId:'201_cup_s1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_cup_w1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_cup_w2',action:'消毒',method:'紫外线消毒',staff:'王姐',note:'',time:new Date(now-2*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_bed_sh1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_bed_sh2',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_bed_qu1',action:'更换',method:'高温水洗',staff:'李姐',note:'',time:new Date(now-4*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_slip_1',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_slip_2',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-1*h).toISOString()},
+    // 202 豪华双床房
+    {id:uid(),roomNo:'202',itemId:'202_cup_s1',action:'消毒',method:'化学消毒',staff:'陈叔',note:'',time:new Date(now-9*h).toISOString()},
+    {id:uid(),roomNo:'202',itemId:'202_cup_w1',action:'消毒',method:'化学消毒',staff:'陈叔',note:'',time:new Date(now-9*h).toISOString()},
+    {id:uid(),roomNo:'202',itemId:'202_bed_sh1',action:'更换',method:'专业洗护',staff:'王姐',note:'一客一换',time:new Date(now-14*h).toISOString()},
+    {id:uid(),roomNo:'202',itemId:'202_bed_qu1',action:'更换',method:'专业洗护',staff:'王姐',note:'一客一换',time:new Date(now-14*h).toISOString()},
+    {id:uid(),roomNo:'202',itemId:'202_slip_1',action:'消杀',method:'臭氧杀菌',staff:'张阿姨',note:'深度清洁',time:new Date(now-8*h).toISOString()},
+    {id:uid(),roomNo:'202',itemId:'202_slip_2',action:'消杀',method:'臭氧杀菌',staff:'张阿姨',note:'深度清洁',time:new Date(now-8*h).toISOString()},
+    // 203 家庭套房 - 用品最多
+    {id:uid(),roomNo:'203',itemId:'203_cup_s1',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_cup_s2',action:'消毒',method:'高温消毒柜',staff:'张阿姨',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_cup_w1',action:'消毒',method:'紫外线消毒',staff:'王姐',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_cup_w2',action:'消毒',method:'紫外线消毒',staff:'王姐',note:'',time:new Date(now-1*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_sh1',action:'更换',method:'高温水洗',staff:'李姐',note:'一客一换',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_sh2',action:'更换',method:'高温水洗',staff:'李姐',note:'一客一换',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_qu1',action:'更换',method:'专业洗护',staff:'李姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_qu2',action:'更换',method:'专业洗护',staff:'李姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_pl1',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_pl2',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_pl3',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_pl4',action:'更换',method:'高温水洗',staff:'王姐',note:'',time:new Date(now-3*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_slip_1',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-1.5*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_slip_2',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-1.5*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_slip_3',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-1.5*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_slip_4',action:'清洗',method:'臭氧杀菌',staff:'小赵',note:'',time:new Date(now-1.5*h).toISOString()},
+    // 更早的历史记录（3天前）
+    {id:uid(),roomNo:'101',itemId:'101_cup_s1',action:'消毒',method:'紫外线消毒',staff:'王姐',note:'例行消毒',time:new Date(now-72*h).toISOString()},
+    {id:uid(),roomNo:'102',itemId:'102_bed_sh1',action:'更换',method:'专业洗护',staff:'李姐',note:'一客一换',time:new Date(now-80*h).toISOString()},
+    {id:uid(),roomNo:'103',itemId:'103_cup_s1',action:'消毒',method:'高温消毒柜',staff:'陈叔',note:'',time:new Date(now-60*h).toISOString()},
+    {id:uid(),roomNo:'201',itemId:'201_bed_sh1',action:'更换',method:'高温水洗',staff:'李姐',note:'客人要求更换',time:new Date(now-48*h).toISOString()},
+    {id:uid(),roomNo:'203',itemId:'203_bed_sh1',action:'更换',method:'专业洗护',staff:'王姐',note:'一客一换',time:new Date(now-55*h).toISOString()},
   ];
   sv(D);
 }
